@@ -29,7 +29,29 @@ export const userSevice = {
     if (!user) {
       throw new ApiError("User not found");
     }
-    return { success: true, user };
+    return {
+      success: true,
+      message: "User data updated successfully",
+      data: user,
+    };
+  },
+
+  chatHistory: async (userId: string) => {
+    if (!userId) {
+      throw new ApiError("User ID is required");
+    }
+    const chats = await UserModel.find({ _id: userId })
+      .populate("chats")
+      .exec();
+    if (!chats || chats.length === 0) {
+      throw new ApiError("No chat history found for this user");
+    }
+
+    return {
+      success: true,
+      message: "Chats retrieved successfully!",
+      data: chats,
+    };
   },
 
   delete: async (userId: string) => {

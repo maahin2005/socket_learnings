@@ -26,3 +26,79 @@ export const myData = async (
     });
   }
 };
+
+export const updateUser = async (
+  req: AuthenticatedRequest,
+  res: Response<ApiResponse>
+) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Error while updating user data!",
+        error: "User ID is required",
+      });
+    }
+    const data = req.body;
+    const result = await userSevice.update(userId, data);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error("Update user data error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while updating user data!",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+export const chatHistory = async (
+  req: AuthenticatedRequest,
+  res: Response<ApiResponse>
+) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Error while fetching chat history!",
+        error: "User ID is required",
+      });
+    }
+    const result = await userSevice.chatHistory(userId);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error("Fetch chat history error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while fetching chat history!",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+export const deleteUser = async (
+  req: AuthenticatedRequest,
+  res: Response<ApiResponse>
+) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Error while deleting user!",
+        error: "User ID is required",
+      });
+    }
+    const result = await userSevice.delete(userId);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error("Delete user error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while deleting user!",
+      error: error.message || "Internal server error",
+    });
+  }
+};
