@@ -7,6 +7,7 @@ import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/errorHandler.middleware";
+import router from "./routes";
 
 const PORT = envConfig.port || 9090;
 const server = express();
@@ -28,6 +29,7 @@ server.get("/", (_, res: any) => {
   });
 });
 
+server.use("/api", router);
 // Error Handling
 server.use(notFoundHandler);
 server.use(errorHandler);

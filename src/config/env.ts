@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { ApiError } from "../utils/apiError";
 
 interface ProcessEnv {
   [key: string]: string;
@@ -18,7 +19,7 @@ interface EnvConfig {
 const getEnvVar = (key: string, defaultValue?: string): string => {
   const value = myEnv[key] || defaultValue;
   if (!value) {
-    throw new Error(`Environment variable ${key} is not set`);
+    throw new ApiError(`Environment variable ${key} is not set`);
   }
   return value;
 };
