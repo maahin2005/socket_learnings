@@ -1,13 +1,22 @@
 import dotenv from "dotenv";
-dotenv.config();
+
+interface ProcessEnv {
+  [key: string]: string;
+}
+
+const myEnv: ProcessEnv = {};
+
+dotenv.config({ processEnv: myEnv, debug: false });
 
 interface EnvConfig {
   port: number;
   mongodbUri: string;
+  sessionSecret: string;
+  sessionMaxAge: number;
 }
 
 const getEnvVar = (key: string, defaultValue?: string): string => {
-  const value = process.env[key] || defaultValue;
+  const value = myEnv[key] || defaultValue;
   if (!value) {
     throw new Error(`Environment variable ${key} is not set`);
   }
@@ -17,4 +26,6 @@ const getEnvVar = (key: string, defaultValue?: string): string => {
 export const envConfig: EnvConfig = {
   port: parseInt(getEnvVar("PORT", "3000"), 10),
   mongodbUri: getEnvVar("MONGODB_URI", "mongodb://localhost:27017/mydatabase"),
+  sessionSecret: getEnvVar("SESSION_SECRET", "mysecretkey"),
+  sessionMaxAge: parseInt(getEnvVar("SESSION_MAX_AGE"), 10),
 };
