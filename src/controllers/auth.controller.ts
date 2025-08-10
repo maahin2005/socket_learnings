@@ -54,3 +54,20 @@ export const register = async (
     });
   }
 };
+
+export const logout = async (
+  req: AuthenticatedRequest,
+  res: Response<ApiResponse>
+) => {
+  try {
+    const result = await authService.logout(req.session);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while logging out!",
+      error: error.message || "Internal server error",
+    });
+  }
+};

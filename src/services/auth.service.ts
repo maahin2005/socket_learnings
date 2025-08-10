@@ -43,4 +43,20 @@ export const authService = {
     session.isAuthenticated = true;
     return { success: true, message: "User registered successfully" };
   },
+
+  logout: async (session: any) => {
+    if (!session.isAuthenticated) {
+      throw new ApiError("User is not authenticated");
+    }
+    // Destroy session
+    session.destroy((err: any) => {
+      if (err) {
+        throw new ApiError("Error while logging out");
+      }
+    });
+    return { success: true, message: "User logged out successfully" };
+  },
+  isAuthenticated: (session: any) => {
+    return session && session.isAuthenticated;
+  },
 };
