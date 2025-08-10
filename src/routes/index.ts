@@ -1,6 +1,8 @@
 import { Response, Router } from "express";
 import { ApiResponse } from "../types/api";
 import authRoutes from "./auth.routes";
+import userRoutes from "./user.routes";
+import { authenticate } from "../middleware/authenticate.middleware";
 
 const router = Router();
 
@@ -17,5 +19,6 @@ router.get("/health", (req, res: Response<ApiResponse>) => {
 });
 
 router.use("/auth", authRoutes);
+router.use("/user", authenticate, userRoutes);
 
 export default router;

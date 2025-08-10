@@ -9,24 +9,48 @@ export const login = async (
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Error while Login!",
-          error: "Username and password are required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Error while Login!",
+        error: "Username and password are required",
+      });
     }
-    const result = await authService.login({ username, password });
+    const result = await authService.login({ username, password }, req.session);
     return res.status(200).json(result);
   } catch (error: any) {
     console.error("Login error:", error);
-    return res
-      .status(500)
-      .json({
+    return res.status(500).json({
+      success: false,
+      message: "Error while Login!",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+export const register = async (
+  req: AuthenticatedRequest,
+  res: Response<ApiResponse>
+) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({
         success: false,
-        message: "Error while Login!",
-        error: error.message || "Internal server error",
+        message: "Error while Registering!",
+        error: "Username and password are required",
       });
+    }
+    const result = await authService.register(
+      { username, password },
+      req.session
+    );
+    return res.status(201).json(result);
+  } catch (error: any) {
+    console.error("Registration error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while Registering!",
+      error: error.message || "Internal server error",
+    });
   }
 };
