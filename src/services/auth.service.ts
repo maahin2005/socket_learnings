@@ -1,4 +1,3 @@
-import { register } from "module";
 import { UserModel } from "../models/users.model";
 import { AuthLoginRequest } from "../types/auth";
 import { ApiError } from "../utils/apiError";

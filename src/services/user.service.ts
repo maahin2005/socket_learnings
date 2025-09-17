@@ -1,4 +1,5 @@
 import { UserModel } from "../models/users.model";
+import { ChatModel } from "../models/chat.model";
 import { User } from "../types/index.model";
 import { ApiError } from "../utils/apiError";
 
@@ -40,17 +41,73 @@ export const userSevice = {
     if (!userId) {
       throw new ApiError("User ID is required");
     }
-    const chats = await UserModel.find({ _id: userId })
-      .populate("chats")
-      .exec();
-    if (!chats || chats.length === 0) {
-      throw new ApiError("No chat history found for this user");
-    }
+    const chats = await ChatModel.find({
+      $or: [{ from: userId }, { to: userId }],
+    })
+      .sort({ timestamp: 1 })
+      .lean();
 
     return {
       success: true,
       message: "Chats retrieved successfully!",
       data: chats,
+    };
+  },
+
+  conversationWith: async (userId: string, peerId: string) => {
+    if (!userId || !peerId) {
+      throw new ApiError("User ID and peer ID are required");
+    }
+    const chats = await ChatModel.find({
+      $or: [
+        { from: userId, to: peerId },
+        { from: peerId, to: userId },
+      ],
+    })
+      .sort({ timestamp: 1 })
+      .lean();
+
+    return {
+      success: true,
+      message: "Conversation retrieved successfully!",
+      data: chats,
+    };
+  },
+
+  conversationPeers: async (userId: string) => {
+    if (!userId) {
+      throw new ApiError("User ID is required");
+    }
+    const peers = await ChatModel.aggregate([
+      {
+        $match: {
+          $or: [{ from: userId }, { to: userId }],
+        },
+      },
+      {
+        $project: {
+          peer: {
+            $cond: [{ $eq: ["$from", userId] }, "$to", "$from"],
+          },
+          timestamp: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$peer",
+          lastMessageAt: { $max: "$timestamp" },
+        },
+      },
+      { $sort: { lastMessageAt: -1 } },
+    ]);
+
+    return {
+      success: true,
+      message: "Conversation peers retrieved successfully!",
+      data: peers.map((p) => ({
+        peerId: p._id,
+        lastMessageAt: p.lastMessageAt,
+      })),
     };
   },
 

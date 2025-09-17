@@ -8,10 +8,10 @@ export const sessionConfig = session({
   saveUninitialized: false,
   rolling: true,
   cookie: {
-    secure: false, // Set to true if using HTTPS
+    secure: process.env.NODE_ENV === "production",
     maxAge: envConfig.sessionMaxAge,
     httpOnly: true,
-    sameSite: "none", // Use 'lax' or 'strict' if you don't need cross-site cookies
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   },
   store: MongoStore.create({
     mongoUrl: envConfig.mongodbUri,
@@ -19,7 +19,7 @@ export const sessionConfig = session({
     collectionName: "sessions",
     ttl: envConfig.sessionMaxAge / 1000, // TTL in seconds
   }),
-  name: "hydro-vatika-session",
+  name: "socket-chat-session",
 });
 
 console.log("✅ Session configuration initialized");

@@ -14,6 +14,7 @@ interface EnvConfig {
   mongodbUri: string;
   sessionSecret: string;
   sessionMaxAge: number;
+  clientOrigins: string[];
 }
 
 const getEnvVar = (key: string, defaultValue?: string): string => {
@@ -28,5 +29,16 @@ export const envConfig: EnvConfig = {
   port: parseInt(getEnvVar("PORT", "3000"), 10),
   mongodbUri: getEnvVar("MONGODB_URI", "mongodb://localhost:27017/mydatabase"),
   sessionSecret: getEnvVar("SESSION_SECRET", "mysecretkey"),
-  sessionMaxAge: parseInt(getEnvVar("SESSION_MAX_AGE"), 10),
+  // Default to 14 days in milliseconds if not provided
+  sessionMaxAge: parseInt(
+    getEnvVar("SESSION_MAX_AGE", String(14 * 24 * 60 * 60 * 1000)),
+    10
+  ),
+  clientOrigins: getEnvVar(
+    "CLIENT_ORIGIN",
+    "http://localhost:3000,http://127.0.0.1:3000"
+  )
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
 };

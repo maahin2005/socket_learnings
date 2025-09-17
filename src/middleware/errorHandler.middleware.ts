@@ -43,8 +43,12 @@ export const errorHandler = (
   };
 
   // Only include error details in non-production environments
-  if (process.env.NODE_ENV !== "production" && error.message) {
-    response.error = error.message;
+  if (process.env.NODE_ENV !== "production") {
+    if ((error as any).errors) {
+      response.error = (error as any).errors;
+    } else if (error.message) {
+      response.error = error.message;
+    }
   }
 
   res.status(statusCode).json(response);

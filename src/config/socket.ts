@@ -1,6 +1,7 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
 import { logger } from "../middleware/logger.middleware";
+import { envConfig } from "./env";
 import { ChatModel } from "../models/chat.model";
 
 interface ISocketConfigOptions {
@@ -18,9 +19,11 @@ export const socketConfig = ({
   httpServer,
   sessionConfig,
 }: ISocketConfigOptions) => {
+  const allowedOrigins = envConfig.clientOrigins;
+
   const io = new Server(httpServer, {
     cors: {
-      origin: "*", // TODO: Change to your frontend URL
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
       credentials: true,
     },
